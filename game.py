@@ -70,12 +70,27 @@ def mover_ficha(tabla,ficha,movimiento):
             tabla = insertar_en_tabla(nueva_ficha,tabla)
         else:
             print("Movimiento invalido")
-    if (movimiento == "NE"): # Diagonal superior izquierda
-        pass
-    if (movimiento == "SE"): # Diagonal inferior izquierda
-        pass
-    if (movimiento == "SO"): # Diagonal inferior derecha
-        pass
-    if (movimiento == "NO"): # Diagonal superior derecha
-        pass
+    if (movimiento == "NE"):  # Diagonal superior izquierda
+        if limite_matriz(ficha[0] - 1, ficha[1] + 1) and tabla[ficha[0] - 1][ficha[1] + 1] == "-":
+            nueva_ficha = [ficha[0] - 1, ficha[1] + 1, ficha[2]]
+            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
+            tabla = insertar_en_tabla(nueva_ficha, tabla)
+
+    if (movimiento == "SE"):  # Sur Este, Diagonal inferior izquierda
+        if limite_matriz(ficha[0] + 1, ficha[1] + 1) and tabla[ficha[0] + 1][ficha[1] + 1] == "-":
+            nueva_ficha = [ficha[0] + 1, ficha[1] + 1, ficha[2]]
+            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
+            tabla = insertar_en_tabla(nueva_ficha, tabla)
+
+    if (movimiento == "SO"):  # Diagonal inferior derecha
+        if limite_matriz(ficha[0] + 1, ficha[1] - 1) and tabla[ficha[0] + 1][ficha[1] - 1] == "-":
+            nueva_ficha = [ficha[0] + 1, ficha[1] - 1, ficha[2]]
+            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
+            tabla = insertar_en_tabla(nueva_ficha, tabla)
+
+    if (movimiento == "NO"):  # Diagonal superior derecha
+        if limite_matriz(ficha[0] - 1, ficha[1] - 1) and tabla[ficha[0] - 1][ficha[1] - 1] == "-":
+            nueva_ficha = [ficha[0] - 1, ficha[1] - 1, ficha[2]]
+            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
+            tabla = insertar_en_tabla(nueva_ficha, tabla)
     return nueva_ficha
