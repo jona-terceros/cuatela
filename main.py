@@ -34,6 +34,12 @@ def juego():
             else:
                 print("¡Victoria para las fichas negras!")
             break
+        if verificar_victoria2(tabla):
+            if turno % 2 == 0:
+                print("¡Victoria para las fichas blancas!")
+            else:
+                print("¡Victoria para las fichas negras!")
+            break
         continuar = input("Desea Continuar (S,N): ")
         if continuar == "N":
             return False

@@ -87,7 +87,7 @@ def mover_ficha(tabla,ficha,movimiento):
         while limite_matriz(ficha[0] - i, ficha[1] + i) and tabla[ficha[0] - i][ficha[1] + i] == "-":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] - i+1, ficha[1] + i -1, ficha[2]]
+            nueva_ficha = [ficha[0] - (i+1), ficha[1] + (i-1), ficha[2]]
             tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
             tabla = insertar_en_tabla(nueva_ficha, tabla)
 
@@ -96,7 +96,7 @@ def mover_ficha(tabla,ficha,movimiento):
         while limite_matriz(ficha[0] + i, ficha[1] + i) and tabla[ficha[0] + i][ficha[1] + i] == "-":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] + i -1, ficha[1] + i-1, ficha[2]]
+            nueva_ficha = [ficha[0] + (i -1), ficha[1] + (i-1), ficha[2]]
             tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
             tabla = insertar_en_tabla(nueva_ficha, tabla)
 
@@ -105,7 +105,7 @@ def mover_ficha(tabla,ficha,movimiento):
         while limite_matriz(ficha[0] + i, ficha[1] - i) and tabla[ficha[0] + i][ficha[1] - i] == "-":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] + i-1, ficha[1] - i-1, ficha[2]]
+            nueva_ficha = [ficha[0] + (i-1), ficha[1] - (i-1), ficha[2]]
             tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
             tabla = insertar_en_tabla(nueva_ficha, tabla)
 
@@ -114,7 +114,7 @@ def mover_ficha(tabla,ficha,movimiento):
         while limite_matriz(ficha[0] - i, ficha[1] - i) and tabla[ficha[0] - i][ficha[1] - i] == "-":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] - i-1, ficha[1] - i-1, ficha[2]]
+            nueva_ficha = [ficha[0] - (i-1), ficha[1] - (i-1), ficha[2]]
             tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
             tabla = insertar_en_tabla(nueva_ficha, tabla)
     return nueva_ficha
@@ -132,3 +132,14 @@ def verificar_victoria(tabla):
         return True
     else:
         return False
+def verificar_victoria2(tabla):
+    #fila
+    for fila in tabla:
+        if all(celda == fila[0] and celda != "-" for celda in fila):
+            return True
+
+    #columna
+    for j in range(4):
+        if all(tabla[i][j] == tabla[0][j] and tabla[i][j] != "-" for i in range(4)):
+            return True
+    return False
