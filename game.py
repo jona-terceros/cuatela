@@ -94,3 +94,14 @@ def mover_ficha(tabla,ficha,movimiento):
             tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
             tabla = insertar_en_tabla(nueva_ficha, tabla)
     return nueva_ficha
+
+def verificar_victoria(tabla):
+    esquina_superior_izquierda = tabla[0][0]
+    esquina_superior_derecha = tabla[0][3]
+    esquina_inferior_izquierda = tabla[3][0]
+    esquina_inferior_derecha = tabla[3][3]
+
+    if esquina_superior_izquierda != "-" and esquina_superior_izquierda == esquina_superior_derecha == esquina_inferior_izquierda == esquina_inferior_derecha:
+        return True
+    else:
+        return False

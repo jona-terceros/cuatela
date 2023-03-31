@@ -28,6 +28,12 @@ def juego():
             fichas_negras[numero_ficha - 1] = mover_ficha(tabla,ficha,movimiento)
         #ficha = input("Insertar ficha en (fila,columna,ficha) o salir: ")
         #datos_ficha = ficha.split(sep=",")
+        if verificar_victoria(tabla):
+            if turno % 2 == 0:
+                print("¡Victoria para las fichas blancas!")
+            else:
+                print("¡Victoria para las fichas negras!")
+            break
         continuar = input("Desea Continuar (S,N): ")
         if continuar == "N":
             return False
