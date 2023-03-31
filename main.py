@@ -1,3 +1,5 @@
+from game import *
+import os
 
 def juego():
     print("Juego cautela")
