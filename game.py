@@ -87,7 +87,7 @@ def mover_ficha(tabla,ficha,movimiento):
         while limite_matriz(ficha[0] - i, ficha[1] + i) and tabla[ficha[0] - i][ficha[1] + i] == "-":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] - (i+1), ficha[1] + (i-1), ficha[2]]
+            nueva_ficha = [ficha[0] - (i-1), ficha[1] + (i-1), ficha[2]]
             tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
             tabla = insertar_en_tabla(nueva_ficha, tabla)
 
@@ -142,4 +142,27 @@ def verificar_victoria2(tabla):
     for j in range(4):
         if all(tabla[i][j] == tabla[0][j] and tabla[i][j] != "-" for i in range(4)):
             return True
+    return False
+
+def verificar_victoria3(tabla):
+    
+    if tabla[0][0] != "-" and tabla[0][0] == tabla[0][1] == tabla[1][0] == tabla[1][1]:
+        return True
+    if tabla[0][1] != "-" and tabla[0][1] == tabla[0][2] == tabla[1][1] == tabla[1][2]:
+        return True
+    if tabla[0][2] != "-" and tabla[0][2] == tabla[0][3] == tabla[1][2] == tabla[1][3]:
+        return True
+    if tabla[1][0] != "-" and tabla[1][0] == tabla[1][1] == tabla[2][0] == tabla[2][1]:
+        return True
+    if tabla[1][1] != "-" and tabla[1][1] == tabla[1][2] == tabla[2][1] == tabla[2][2]:
+        return True
+    if tabla[1][2] != "-" and tabla[1][2] == tabla[1][3] == tabla[2][2] == tabla[2][3]:
+        return True
+    if tabla[2][0] != "-" and tabla[2][0] == tabla[2][1] == tabla[3][0] == tabla[3][1]:
+        return True
+    if tabla[2][1] != "-" and tabla[2][1] == tabla[2][2] == tabla[3][1] == tabla[3][2]:
+        return True
+    if tabla[2][2] != "-" and tabla[2][2] == tabla[2][3] == tabla[3][2] == tabla[3][3]:
+        return True
+
     return False
