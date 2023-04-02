@@ -1,3 +1,5 @@
+import math
+
 def crear_tabla():
     tabla = [["-","-","-","-"],
              ["-","-","-","-"],
@@ -166,3 +168,156 @@ def verificar_victoria3(tabla):
         return True
 
     return False
+
+
+# Alpha-Betha pruning algorithm
+'''
+def alpha_beta_search(table):
+    alpha = -math.inf
+    beta = math.inf
+    best_action = None
+    if ai_piece == 'X': #if maximaxing player
+      for action in actions(table, ai_piece):
+          v = min_value(action, alpha, beta)
+          if v > alpha:
+              alpha = v
+              best_action = action
+    else:
+      for action in actions(table, ai_piece):
+          v = max_value(action, alpha, beta)
+          if v < beta:
+            beta = v
+            best_action = action
+    return best_action
+'''
+'''
+def alpha_beta(table,  maximizing_player):
+  alpha = -math.inf
+  beta = math.inf
+  if terminal_test(table):
+      return utility(table)
+  if maximizing_player:
+      v = -math.inf
+      for action in actions(table, ai_piece):
+          v = max(v, alpha_beta(action, alpha, beta, False))
+          alpha = max(alpha, v)
+          if beta <= alpha:
+              break
+      return v
+  else:
+      v = math.inf
+      for action in actions(table, ai_piece):
+          v = min(v, alpha_beta(action, alpha, beta, True))
+          beta = min(beta, v)
+          if beta <= alpha:
+              break
+      return v
+'''
+def alpha_beta_pruning(table):
+    maximizing_player=True
+
+    best_action = None
+    if maximizing_player:  # Maximizing player
+        best_value = -math.inf
+        for action in actions(table, ai_piece):
+            value = min_value(result(table, action), alpha, beta)
+            if value > best_value:
+                best_value = value
+                best_action = action
+            alpha = max(alpha, best_value)
+            if beta <= alpha:
+                break
+    else:  # Minimizing player
+        best_value = math.inf
+        for action in actions(table, human_piece):
+            value = max_value(result(table, action), alpha, beta)
+            if value < best_value:
+                best_value = value
+                best_action = action
+            beta = min(beta, best_value)
+            if beta <= alpha:
+                break
+
+    return best_action, best_value
+
+def max_value(table, alpha, beta):
+    if (terminal_test(table)):
+        return utility(table)
+    v = -math.inf
+    for action in actions(table, ai_piece):
+        v = max(v, min_value(action, alpha, beta))
+        if v >= beta:
+            return v
+        alpha = max(alpha, v)
+    return v
+
+def min_value(table, alpha, beta):
+    if (terminal_test(table)):
+        return utility(table)
+    v = math.inf
+    for action in actions(table, ai_piece):
+        v = min(v, max_value(action, alpha, beta))
+        if v <= alpha:
+            return v
+        beta = min(beta, v)
+    return v
+
+# functions for alpha-beta def
+def actions(table, ai_piece):
+  res = []
+  for i in range(len(table)):
+    for j in range(len(table[i])):
+      if table[i][j]==ai_piece:
+        # Mueves
+        f, c = i,j
+        c_table = copy.deepcopy(table)
+        for k in range(8):
+          nf, nc = f + cf[k], c + cc[k]
+          if nf>=0 and nf<4 and nc>=0 and nc<4:
+            if c_table[nf][nc]=='_':
+              c_table[f][c]='_'
+              c_table[nf][nc] = ai_piece
+              res.append(c_table)
+  return res # devuelve una lista de matrices que son las acciones
+def result(table, action):
+    table = copy.deepcopy(action)
+    return table
+
+
+def terminal_test(table):  # jugador actual #recibiria tambien el turno no
+    # compureba si alguien a ganado , dudas
+    if verificar_victoria(table):
+        return True
+    if verificar_victoria2(table):
+        return True
+    if verificar_victoria3(table):
+        return True
+    # comprueba si hay empate creo que en este juego no hay empate no termina si no hay ganador
+
+    return False
+def utility(table):
+    # ganar en una fila o columna
+    for i in range(4):
+        if table[i][0] == "X" and table[i][0] == table[i][1] == table[i][2] == table[i][3] != "-":
+          return 1
+        else:
+          return -1
+        if table[0][i] == "X" and table[0][i] == table[1][i] == table[2][i] == table[3][i] != "-":
+          return 1
+        else:
+          return -1
+    # ganar cuatro esquinas
+    if table[0][0] == "X" and table[0][0] == table[0][3] == table[3][0] == table[3][3] != "-":
+      return 1
+    else:
+      return -1
+    # cuadrado pequeño
+    for i in range(3):
+        for j in range(3):
+            if (table[i][j] == "X" and table[i][j] == table[i][j+1] == table[i+1][j] == table[i+1][j+1] != "-"):
+              return 1
+            else:
+              return -1
+    # no hay ganador
+    return 0
+# function for main
