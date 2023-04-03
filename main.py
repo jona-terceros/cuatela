@@ -1,5 +1,5 @@
 from copy import deepcopy
-# from game import *
+from game import *
 import os
 
 
