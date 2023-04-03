@@ -1,183 +1,184 @@
 import sys
 sys.setrecursionlimit(10000)
-
 import copy
-def crear_tabla():
-    tabla = [["-", "-", "-", "-"],
-             ["-", "-", "-", "-"],
-             ["-", "-", "-", "-"],
-             ["-", "-", "-", "-"], ]
-    return tabla
+
+def create_board():
+    board = [["_","_","_","_"],
+             ["_","_","_","_"],
+             ["_","_","_","_"],
+             ["_","_","_","_"],]
+    return board
 
 
-def mostrar_tabla(tabla):
-    for fila in tabla:
-        print(fila)
+def show_board(board):
+    print("    A   B   C   D ")
+    print("  +---+---+---+---+")
+    for i in range(4):
+        print(str(i+1) + " | " + " | ".join(board[i]) + " |")
+        print("  +---+---+---+---+")
+        
 
+def piece_format(piece):
+    column = int(piece[0])
+    row = int(piece[1])
+    piece_name = piece[2]
+    return [column, row, piece_name]
 
-def formato_ficha(ficha):
-    columna = int(ficha[0])
-    fila = int(ficha[1])
-    nombre_ficha = ficha[2]
-    return [columna, fila, nombre_ficha]
+def insert_into_table(piece_data, table):
+    column = int(piece_data[0])
+    row = int(piece_data[1])
+    piece = piece_data[2]
 
+    table[column][row] = piece
+    return table
 
-def insertar_en_tabla(datos_ficha, tabla):
-    columna = int(datos_ficha[0])
-    fila = int(datos_ficha[1])
-    ficha = datos_ficha[2]
+def default_board(table,piece_list):
+    for piece in piece_list:
+        table = insert_into_table(piece,table)
+    return table
 
-    tabla[columna][fila] = ficha
-    return tabla
+def show_players_piece(piece_list):
+    counter = 1
+    for piece in piece_list:
+        print(f"Piece {counter}: ({piece[0]},{piece[1]})")
+        counter += 1
 
-
-def tabla_por_defecto(tabla, lista_Fichas):
-    for ficha in lista_Fichas:
-        tabla = insertar_en_tabla(ficha, tabla)
-    return tabla
-
-
-def mostrar_fichas_del_jugador(lista_fichas):
-    contador = 1
-    for ficha in lista_fichas:
-        print(f"Ficha {contador}: ({ficha[0]},{ficha[1]})")
-        contador += 1
-
-
-def limite_matriz(fila, columna):
-    if fila < 0 or fila > 3 or columna < 0 or columna > 3:
-        return False
+def matrix_limit(row, column):
+    if row < 0 or row > 3 or column < 0 or column > 3:
+        return False 
     else:
         return True
+def choose_piece():
+    piece=None
+    if piece:
+        return piece
+    return "O"
 
-
-def mover_ficha(tabla, ficha, movimiento):
-    nueva_ficha = ficha
-    if (movimiento == "N"):  # Arriba
+def move_piece(table, piece, movement):
+    new_piece = piece
+    if (movement == "N"):  # Up
         i = 1
-        while limite_matriz(ficha[0] - i, ficha[1]) and tabla[ficha[0] - i][ficha[1]] == "-":
+        while matrix_limit(piece[0]-i, piece[1]) and table[piece[0]-i][piece[1]] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] - i + 1, ficha[1], ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0]-i+1, piece[1], piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
         else:
-            print("Movimiento invalido")
-    if (movimiento == "E"):  # derecha
+            print("Invalid movement")
+    if (movement == "E"):  # Right
         i = 1
-        while limite_matriz(ficha[0], ficha[1] + i) and tabla[ficha[0]][ficha[1] + i] == "-":
+        while matrix_limit(piece[0], piece[1]+i) and table[piece[0]][piece[1]+i] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0], ficha[1] + i - 1, ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0], piece[1]+i-1, piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
         else:
-            print("Movimiento invalido")
-    if (movimiento == "S"):  # Abajo
+            print("Invalid movement")
+    if (movement == "S"):  # Down
         i = 1
-        while limite_matriz(ficha[0] + i, ficha[1]) and tabla[ficha[0] + i][ficha[1]] == "-":
+        while matrix_limit(piece[0]+i, piece[1]) and table[piece[0]+i][piece[1]] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] + i - 1, ficha[1], ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0]+i-1, piece[1], piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
         else:
-            print("Movimiento invalido")
-    if (movimiento == "O"):  # izquierda
+            print("Invalid movement")
+    if (movement == "O"):  # Left
         i = 1
-        while limite_matriz(ficha[0], ficha[1] - i) and tabla[ficha[0]][ficha[1] - i] == "-":
+        while matrix_limit(piece[0], piece[1]-i) and table[piece[0]][piece[1]-i] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0], ficha[1] - i + 1, ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0], piece[1]-i+1, piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
         else:
-            print("Movimiento invalido")
-    if (movimiento == "NE"):  # Diagonal superior derecha
+            print("Invalid movement")
+    if (movement == "NE"):  # Upper right diagonal
         i = 1
-        while limite_matriz(ficha[0] - i, ficha[1] + i) and tabla[ficha[0] - i][ficha[1] + i] == "-":
+        while matrix_limit(piece[0]-i, piece[1]+i) and table[piece[0]-i][piece[1]+i] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] - (i - 1), ficha[1] + (i - 1), ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0]-(i-1), piece[1]+(i-1), piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
 
-    if (movimiento == "SE"):  # Sur Este, Diagonal inferior derecha
+    if (movement == "SE"):  # Lower right diagonal
         i = 1
-        while limite_matriz(ficha[0] + i, ficha[1] + i) and tabla[ficha[0] + i][ficha[1] + i] == "-":
+        while matrix_limit(piece[0]+i, piece[1]+i) and table[piece[0]+i][piece[1]+i] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] + (i - 1), ficha[1] + (i - 1), ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0]+(i-1), piece[1]+(i-1), piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
 
-    if (movimiento == "SO"):  # Diagonal inferior izquierda
+    if (movement == "SO"): # Lower left diagonal
         i = 1
-        while limite_matriz(ficha[0] + i, ficha[1] - i) and tabla[ficha[0] + i][ficha[1] - i] == "-":
+        while matrix_limit(piece[0] + i, piece[1] - i) and table[piece[0] + i][piece[1] - i] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] + (i - 1), ficha[1] - (i - 1), ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
+            new_piece = [piece[0] + (i-1), piece[1] - (i-1), piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
 
-    if (movimiento == "NO"):  # Diagonal superior izquierda
+    if (movement == "NO"): # Upper left diagonal
         i = 1
-        while limite_matriz(ficha[0] - i, ficha[1] - i) and tabla[ficha[0] - i][ficha[1] - i] == "-":
+        while matrix_limit(piece[0] - i, piece[1] - i) and table[piece[0] - i][piece[1] - i] == "_":
             i += 1
         if i > 1:
-            nueva_ficha = [ficha[0] - (i - 1), ficha[1] - (i - 1), ficha[2]]
-            tabla = insertar_en_tabla([ficha[0], ficha[1], "-"], tabla)
-            tabla = insertar_en_tabla(nueva_ficha, tabla)
-    return nueva_ficha
+            new_piece = [piece[0] - (i-1), piece[1] - (i-1), piece[2]]
+            table = insert_into_table([piece[0], piece[1], "_"], table)
+            table = insert_into_table(new_piece, table)
+
+    return new_piece
 
 
-def verificar_victoria(tabla):
-    esquina_superior_izquierda = tabla[0][0]
-    esquina_superior_derecha = tabla[0][3]
-    esquina_inferior_izquierda = tabla[3][0]
-    esquina_inferior_derecha = tabla[3][3]
+def verify_victory(table):
+    if type(table) is not list:
+        return False
 
-    if esquina_superior_izquierda != "-" and esquina_superior_izquierda == esquina_superior_derecha == esquina_inferior_izquierda == esquina_inferior_derecha:
+    if table[0][0] != "-" and table[0][0] == table[0][3] == table[3][0] == table[3][3]:
         return True
     else:
         return False
 
-
-def verificar_victoria2(tabla):
-    # fila
-    for fila in tabla:
-        if all(celda == fila[0] and celda != "-" for celda in fila):
+def verify_victory2(table):
+    # row
+    for row in table:
+        if isinstance(row, list) and all(cell == row[0] and cell != "-" for cell in row):
             return True
 
-    # columna
+    # column
     for j in range(4):
-        if all(tabla[i][j] == tabla[0][j] and tabla[i][j] != "-" for i in range(4)):
+        if all(table[i][j] == table[0][j] and table[i][j] != "-" for i in range(4)):
             return True
     return False
 
 
-def verificar_victoria3(tabla):
-    if tabla[0][0] != "-" and tabla[0][0] == tabla[0][1] == tabla[1][0] == tabla[1][1]:
+def verify_victory3(table):
+    
+    if table[0][0] != "-" and table[0][0] == table[0][1] == table[1][0] == table[1][1]:
         return True
-    if tabla[0][1] != "-" and tabla[0][1] == tabla[0][2] == tabla[1][1] == tabla[1][2]:
+    if table[0][1] != "-" and table[0][1] == table[0][2] == table[1][1] == table[1][2]:
         return True
-    if tabla[0][2] != "-" and tabla[0][2] == tabla[0][3] == tabla[1][2] == tabla[1][3]:
+    if table[0][2] != "-" and table[0][2] == table[0][3] == table[1][2] == table[1][3]:
         return True
-    if tabla[1][0] != "-" and tabla[1][0] == tabla[1][1] == tabla[2][0] == tabla[2][1]:
+    if table[1][0] != "-" and table[1][0] == table[1][1] == table[2][0] == table[2][1]:
         return True
-    if tabla[1][1] != "-" and tabla[1][1] == tabla[1][2] == tabla[2][1] == tabla[2][2]:
+    if table[1][1] != "-" and table[1][1] == table[1][2] == table[2][1] == table[2][2]:
         return True
-    if tabla[1][2] != "-" and tabla[1][2] == tabla[1][3] == tabla[2][2] == tabla[2][3]:
+    if table[1][2] != "-" and table[1][2] == table[1][3] == table[2][2] == table[2][3]:
         return True
-    if tabla[2][0] != "-" and tabla[2][0] == tabla[2][1] == tabla[3][0] == tabla[3][1]:
+    if table[2][0] != "-" and table[2][0] == table[2][1] == table[3][0] == table[3][1]:
         return True
-    if tabla[2][1] != "-" and tabla[2][1] == tabla[2][2] == tabla[3][1] == tabla[3][2]:
+    if table[2][1] != "-" and table[2][1] == table[2][2] == table[3][1] == table[3][2]:
         return True
-    if tabla[2][2] != "-" and tabla[2][2] == tabla[2][3] == tabla[3][2] == tabla[3][3]:
+    if table[2][2] != "-" and table[2][2] == table[2][3] == table[3][2] == table[3][3]:
         return True
 
     return False
-
 
 def utility(table, player_ai):
     values_list = []
@@ -396,16 +397,39 @@ def result(table, action):
 
 def terminal_test(table):  # jugador actual #recibiria tambien el turno no
     # compureba si alguien a ganado , dudas
-    if verificar_victoria(table):
+    if verify_victory(table):
         return True
-    if verificar_victoria2(table):
+    if verify_victory2(table):
         return True
-    if verificar_victoria3(table):
+    if verify_victory3(table):
         return True
     # comprueba si hay empate creo que en este juego no hay empate no termina si no hay ganador
 
     return False
 
+<<<<<<< HEAD
+=======
+def actions(table, piece):
+  res = []
+  cf = [-1, -1, -1, 0, 0, 1, 1, 1]
+  cc = [-1, 0, 1, -1, 1, -1, 0, 1]
+
+  for i in range(len(table)):
+    for j in range(len(table[i])):
+      if table[i][j]==piece:
+        # Mueves
+        f, c = i,j
+        c_table = copy.deepcopy(table)
+        for k in range(8):
+          nf, nc = f + cf[k], c + cc[k]
+          if nf>=0 and nf<4 and nc>=0 and nc<4:
+            if c_table[nf][nc]=='_':
+              c_table[f][c]='_'
+              c_table[nf][nc] = piece
+              res.append(c_table)
+  return res # devuelve una lista de matrices que son las acciones
+
+>>>>>>> 53362cc2578da408240ce18e8bb90cfec9da79d8
 
 def choose_piece():
     piece = input("¿Qué ficha deseas jugar? (X / O): ").upper()
@@ -418,11 +442,13 @@ from copy import deepcopy
 # from game import *
 import os
 
+
 human_piece = choose_piece()
 if human_piece == 'X':
     ai_piece = 'O'
 else:
     ai_piece = 'X'
+<<<<<<< HEAD
 
 import copy
 
@@ -538,7 +564,69 @@ while juego == True:
         print('el juego ha terminado')
     else:
         continuar = input("Desea Continuar (S,N): ")
+=======
+    
+def game():
+    print("GAME CUATELA")
+    turn = 1
+    # Una ficha = [fila,columna,nombre]
+    black_piece = [[0, 0, "X"], [1, 1, "X"], [2, 2, "X"], [3, 3, "X"]]
+    white_piece = [[3, 0, "O"], [2, 1, "O"], [1, 2, "O"], [0, 3, "O"]]
+    board = default_board(create_board(), black_piece)
+    board = default_board(board, white_piece)
+
+    while True:
+        os.system("clear")
+        show_board(board)
+        if ai_piece == 'O':
+            if turn % 2 == 0:
+                print("Fichas blancas del jugador 2: Tú")  
+      
+                show_players_piece(black_piece)
+                action_ai = alpha_beta_pruning(board)
+                move_piece(board, ai_piece, action_ai)  
+
+
+            else:
+                # turn Human with X play first
+                    print("Black pieces of player 1 You")
+                    ##minmax_decision(board, "O")
+                    show_players_piece(black_piece)
+                    piece_number = int(input("Choose your piece: "))
+                    movement = input("Choose your Movement (N,S,E,O,NE,NO,SE,SO): ")
+                    piece = black_piece[piece_number - 1]
+                    black_piece[piece_number - 1] = move_piece(board, piece, movement)
+
+        else:
+            if turn % 2 == 0:
+                print("Fichas blancas del jugador 2: Tú")
+                show_players_piece(black_piece)
+                action_ai = alpha_beta_pruning(board)
+                #print(action_ai)
+                move_piece(board, ai_piece, action_ai)  
+
+            else:
+                # turn ia con X
+                # turn humano con X juega primero
+                print("Fichas blancas del jugador 2: Tú")
+                show_players_piece(white_piece)
+                piece_number = int(input("Choose your piece: "))
+                movement = input("Choose your Movement (N,S,E,O,NE,NO,SE,SO): ")
+                piece = white_piece[piece_number - 1]
+                white_piece[piece_number - 1] = move_piece(board, piece, movement)
+
+        continuar = input("Do you wish to continue? (Y,N): ")
+>>>>>>> 53362cc2578da408240ce18e8bb90cfec9da79d8
         if continuar == "N":
             juego = False
         else:
+<<<<<<< HEAD
             juego = True
+=======
+            turn += 1
+
+
+if __name__ == "__main__":
+    game()
+
+>>>>>>> 53362cc2578da408240ce18e8bb90cfec9da79d8
