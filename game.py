@@ -418,6 +418,116 @@ def min_value(table, depth, piece, alpha, beta):
     return memo[id]
 
 
+def utility(table, player_ai):
+    values_list = []
+
+    cant_O_corners = 0
+    cant_X_corners = 0
+
+    # ---------------- count those aligned horizontally-------------------
+    rows = len(table)
+    col = len(table[0])
+
+    # initialize count lists to zero
+    cont_O = [0] * rows
+    cont_X = [0] * rows
+
+    # count the number of X's and O's in each row of the board
+    for i in range(rows):
+        for j in range(col):
+            if table[i][j] == "O":
+                cont_O[i] += 1
+            elif table[i][j] == "X":
+                cont_X[i] += 1
+    # obtain the best value
+    if player_ai == 'X':
+        best = max(cont_X)
+        values_list.append(best)
+    else:
+        best = max(cont_O)
+        values_list.append(best)
+
+    # ---------------- count those aligned vertically-------------------
+    cont_O = [0] * col
+    cont_X = [0] * col
+    for i in range(rows):
+        for j in range(col):
+            if table[i][j] == "O":
+                cont_O[j] += 1
+            elif table[i][j] == "X":
+                cont_X[j] += 1
+    # obtain the best value
+    if player_ai == 'X':
+        best = max(cont_X)
+        values_list.append(best)
+    else:
+        best = max(cont_O)
+        values_list.append(best)
+
+    # --------------------------- corners ----------------------------
+    if table[0][0] == "O":
+        cant_O_corners += 1
+    elif table[0][0] == "X":
+        cant_X_corners += 1
+
+    if table[0][-1] == "O":
+        cant_O_corners += 1
+    elif table[0][-1] == "X":
+        cant_X_corners += 1
+
+    if table[-1][0] == "O":
+        cant_O_corners += 1
+    elif table[-1][0] == "X":
+        cant_X_corners += 1
+
+    if table[-1][-1] == "O":
+        cant_O_corners += 1
+    elif table[-1][-1] == "X":
+        cant_X_corners += 1
+
+    # append to value list
+    if player_ai == 'X':
+        values_list.append(cant_X_corners)
+    else:
+        values_list.append(cant_O_corners)
+
+    # ------------------------------------ square ----------------------------------------
+
+    list_of_lists_O = [[0 for j in range(col - 1)] for i in range(rows - 1)]
+    list_of_lists_X = [[0 for j in range(col - 1)] for i in range(rows - 1)]
+
+    for i in range(rows - 1):
+        for j in range(col - 1):
+            subtable = [[table[i][j], table[i][j + 1]],
+                        [table[i + 1][j], table[i + 1][j + 1]]]
+            num_O = sum(row.count("O") for row in subtable)
+            num_X = sum(row.count("X") for row in subtable)
+            list_of_lists_O[i][j] = num_O
+            list_of_lists_X[i][j] = num_X
+    # inspired by: https://es.stackoverflow.com/questions/461876/
+    # append to value list
+    if player_ai == 'X':
+        best = max(max(i) for i in list_of_lists_X)
+        values_list.append(best)
+    else:
+        best = max(max(i) for i in list_of_lists_O)
+        values_list.append(best)
+
+    rep_2 = values_list.count(2)
+    rep_3 = values_list.count(3)
+    max_value = max(values_list)
+
+    if rep_2 == 2:
+        max_value += 1
+    if rep_2 == 3:
+        max_value += 2
+    if rep_3 == 2:
+        max_value += 3
+    if rep_3 == 3:
+        max_value += 4
+    return max_value
+
+
 def result(table, action):
     table = copy.deepcopy(action)
     return table
