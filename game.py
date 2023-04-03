@@ -457,6 +457,40 @@ def actions(tabla, piece):
     return res
 
 
+import copy
+
+human_piece = choose_piece()
+if human_piece == 'X':
+    ai_piece = 'O'
+else:
+    ai_piece = 'X'
+
+fichas_negras = [[0, 0, "X"], [1, 1, "X"], [2, 2, "X"], [3, 3, "X"]]
+fichas_blancas = [[3, 0, "O"], [2, 1, "O"], [1, 2, "O"], [0, 3, "O"]]
+tabla = tabla_por_defecto(crear_tabla(), fichas_negras)
+tabla = tabla_por_defecto(tabla, fichas_blancas)
+mostrar_tabla(tabla)
+
+cf = [-1, -1, 0, 1, 1, 1, 0, -1]
+cc = [0, 1, 1, 1, 0, -1, -1, -1]
+
+
+def actions(tabla, piece):
+    res = []
+    for i in range(len(tabla)):
+        for j in range(len(tabla[i])):
+            if tabla[i][j] == piece:
+                for k in range(8):
+                    nf, nc = i + cf[k], j + cc[k]
+                    while 0 <= nf < len(tabla) and 0 <= nc < len(tabla[i]) and tabla[nf][nc] == '-':
+                        new_tabla = copy.deepcopy(tabla)
+                        new_tabla[i][j] = '-'
+                        new_tabla[nf][nc] = piece
+                        res.append(new_tabla)
+                        nf, nc = nf + cf[k], nc + cc[k]
+    return res
+
+
 juego = True
 while juego == True:
 
@@ -502,7 +536,6 @@ while juego == True:
 
     if verificar_victoria(tabla) == True or verificar_victoria2(tabla) == True or verificar_victoria3(tabla) == True:
         print('el juego ha terminado')
-        juego = False
     else:
         continuar = input("Desea Continuar (S,N): ")
         if continuar == "N":
