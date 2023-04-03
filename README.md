@@ -38,7 +38,7 @@ Now, we could return this value as the utility value but we know  that there are
 
 
 <div align="center">
-    <img src="./img/heuristica.png" alt="Logo" width="120" height="80">
+    <img src="./img/heuristica.png" alt="Logo" width="360" height="100">
   </a>
 
 
