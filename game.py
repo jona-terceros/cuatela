@@ -1,5 +1,11 @@
 import math
 import copy
+import copy
+import sys
+
+sys.setrecursionlimit(10000)
+
+
 def create_board():
     board = [["_","_","_","_"],
              ["_","_","_","_"],
@@ -211,70 +217,134 @@ def verify_victory3(table):
 
 # Alpha-Betha pruning algorithm
 
-def alpha_beta_search(table, ai_piece):
+def utility(table, player_ai):
+    values_list = []
+
+    cant_O_corners = 0
+    cant_X_corners = 0
+
+    # ---------------- count those aligned horizontally-------------------
+    rows = len(table)
+    col = len(table[0])
+
+    # initialize count lists to zero
+    cont_O = [0] * rows
+    cont_X = [0] * rows
+
+    # count the number of X's and O's in each row of the board
+    for i in range(rows):
+        for j in range(col):
+            if table[i][j] == "O":
+                cont_O[i] += 1
+            elif table[i][j] == "X":
+                cont_X[i] += 1
+    # obtain the best value
+    if player_ai == 'X':
+        best = max(cont_X)
+        values_list.append(best)
+    else:
+        best = max(cont_O)
+        values_list.append(best)
+
+    # ---------------- count those aligned vertically-------------------
+    cont_O = [0] * col
+    cont_X = [0] * col
+    for i in range(rows):
+        for j in range(col):
+            if table[i][j] == "O":
+                cont_O[j] += 1
+            elif table[i][j] == "X":
+                cont_X[j] += 1
+    # obtain the best value
+    if player_ai == 'X':
+        best = max(cont_X)
+        values_list.append(best)
+    else:
+        best = max(cont_O)
+        values_list.append(best)
+
+    # --------------------------- corners ----------------------------
+    if table[0][0] == "O":
+        cant_O_corners += 1
+    elif table[0][0] == "X":
+        cant_X_corners += 1
+
+    if table[0][-1] == "O":
+        cant_O_corners += 1
+    elif table[0][-1] == "X":
+        cant_X_corners += 1
+
+    if table[-1][0] == "O":
+        cant_O_corners += 1
+    elif table[-1][0] == "X":
+        cant_X_corners += 1
+
+    if table[-1][-1] == "O":
+        cant_O_corners += 1
+    elif table[-1][-1] == "X":
+        cant_X_corners += 1
+
+    # append to value list
+    if player_ai == 'X':
+        values_list.append(cant_X_corners)
+    else:
+        values_list.append(cant_O_corners)
+
+    # ------------------------------------ square ----------------------------------------
+
+    list_of_lists_O = [[0 for j in range(col - 1)] for i in range(rows - 1)]
+    list_of_lists_X = [[0 for j in range(col - 1)] for i in range(rows - 1)]
+
+    for i in range(rows - 1):
+        for j in range(col - 1):
+            subtable = [[table[i][j], table[i][j + 1]],
+                        [table[i + 1][j], table[i + 1][j + 1]]]
+            num_O = sum(row.count("O") for row in subtable)
+            num_X = sum(row.count("X") for row in subtable)
+            list_of_lists_O[i][j] = num_O
+            list_of_lists_X[i][j] = num_X
+    # inspired by: https://es.stackoverflow.com/questions/461876/
+    # append to value list
+    if player_ai == 'X':
+        best = max(max(i) for i in list_of_lists_X)
+        values_list.append(best)
+    else:
+        best = max(max(i) for i in list_of_lists_O)
+        values_list.append(best)
+
+    utility_value = max(values_list)
+    return utility_value
+
+
+#--------------min-max alpha beta---------------------
+from IPython.utils.path import get_ipython_dir
+import math
+
+memo = []
+max_depth = 20
+
+
+def alpha_beta_pruning(table):
+    global memo
+    maximizing_player = True
     alpha = -math.inf
     beta = math.inf
     best_action = None
-    if ai_piece == 'X': #if maximaxing player
-        for start_pos, end_pos in actions(table, ai_piece):
-            v = min_value(result(table, start_pos, end_pos), alpha, beta, 0, 3)
-            if v > alpha:
-                alpha = v
-                best_action = (start_pos, end_pos)
-               
-    else:
-        for start_pos, end_pos in actions(table, ai_piece):
-            v = max_value(result(table, start_pos, end_pos), alpha, beta, 0, 3)
-            if v < beta:
-                beta = v
-                best_action = (start_pos, end_pos)  
-                   
-
-    return best_action
-
-
-'''
-def alpha_beta(table,  maximizing_player):
-  alpha = -math.inf
-  beta = math.inf
-  if terminal_test(table):
-      return utility(table)
-  if maximizing_player:
-      v = -math.inf
-      for action in actions(table, ai_piece):
-          v = max(v, alpha_beta(action, alpha, beta, False))
-          alpha = max(alpha, v)
-          if beta <= alpha:
-              break
-      return v
-  else:
-      v = math.inf
-      for action in actions(table, ai_piece):
-          v = min(v, alpha_beta(action, alpha, beta, True))
-          beta = min(beta, v)
-          if beta <= alpha:
-              break
-      return v
-'''
-def alpha_beta_pruning(table):
-    maximizing_player=True
-    ai_piece = choose_piece(ai_piece)
-    best_action = None
+    memo = [-1] * (3 ** 17 + 10)
     if maximizing_player:  # Maximizing player
         best_value = -math.inf
         for action in actions(table, ai_piece):
-            value = min_value(result(table, action), alpha, beta,3)
+            value = min_value(result(table, action), 0, ai_piece, alpha, beta)
             if value > best_value:
                 best_value = value
                 best_action = action
             alpha = max(alpha, best_value)
             if beta <= alpha:
                 break
-    else:  # Minimizing player
+    else:
         best_value = math.inf
-        human_piece = choose_piece(human_piece)
-        for action in actions(table, human_piece):
-            value = max_value(result(table, action), alpha, beta,3)
+        for action in actions(table, ai_piece):
+            value = max_value(result(table, action), 0, ai_piece, alpha, beta)
             if value < best_value:
                 best_value = value
                 best_action = action
@@ -284,97 +354,101 @@ def alpha_beta_pruning(table):
 
     return best_action, best_value
 
-def max_value(table, alpha, beta, depth, max_depth):
-    if depth >= max_depth:
-        return utility(table)
-    
-    ai_piece = choose_piece()
+
+def get_id_of_table(table):
+    result = 0
+    for i in range(4):
+        for j in range(4):
+            if table[i][j] == 'X':
+                result += (3 ** (i * 4 + j))
+            elif table[i][j] == 'O':
+                result += 2 * (3 ** (i * 4 + j))
+    return result
+
+
+def max_value(table, depth, piece, alpha, beta):
+    global memo
+    id = get_id_of_table(table)
+    if depth > max_depth:
+        memo[id] = utility(table, piece)
+        return memo[id]
+    if memo[id] != -1:
+        return memo[id]
     if (terminal_test(table)):
-        return utility(table)
-    
+        memo[id] = utility(table, piece)
+        return memo[id]
+
     v = -math.inf
-    for action in actions(table, ai_piece):
-        v = max(v, min_value(result(table, action), alpha, beta, depth + 1, max_depth))
+    for action in actions(table, piece):
+        if piece == ai_piece:
+            v = max(v, min_value(action, depth + 1, human_piece, alpha, beta))
+        else:
+            v = max(v, min_value(action, depth + 1, ai_piece, alpha, beta))
         if v >= beta:
-            return v
+            memo[id] = v
+            return memo[id]
         alpha = max(alpha, v)
-    return v
+    memo[id] = v
+    return memo[id]
 
-def min_value(table, alpha, beta, depth, max_depth):
-    if depth >= max_depth:
-        return utility(table)
-    
-    human_piece = choose_piece()
+
+def min_value(table, depth, piece, alpha, beta):
+    global memo
+    id = get_id_of_table(table)
+    if depth > max_depth:
+        memo[id] = utility(table, piece)
+        return memo[id]
+    if memo[id] != -1:
+        return memo[id]
     if (terminal_test(table)):
-        return utility(table)
-    
+        memo[id] = utility(table, piece)
+        return memo[id]
+
     v = math.inf
-    for action in actions(table, human_piece):
-        v = min(v, max_value(result(table, action), alpha, beta, depth + 1, max_depth))
+    for action in actions(table, piece):
+        if piece == ai_piece:
+            v = min(v, max_value(action, depth + 1, human_piece, alpha, beta))
+        else:
+            v = min(v, max_value(action, depth + 1, ai_piece, alpha, beta))
         if v <= alpha:
-            return v
+            memo[id] = v
+            return memo[id]
         beta = min(beta, v)
-    return v
+    memo[id] = v
+    return memo[id]
 
-# functions for alpha-beta def
-def actions(table, ai_piece):
-    res = []
-    cf = [-1,-1,-1,0,0,1,1,1]
-    cc = [-1,0,1,-1,1,-1,0,1]
-    for i in range(len(table)):
-        for j in range(len(table[i])):
-            if table[i][j] == ai_piece:
-                # Move
-                f, c = i, j
-                for k in range(8):
-                    nf, nc = f + cf[k], c + cc[k]
-                    if nf >= 0 and nf < 4 and nc >= 0 and nc < 4:
-                        if table[nf][nc] == '-':
-                            res.append(((i, j), (nf, nc)))
-    return res
 
-def result(board, piece, movement):
-    new_board = copy.deepcopy(board)
-    # Make the move on the new board
-    new_board = move_piece(new_board, piece, movement)
-    return new_board
+def result(table, action):
+    table = copy.deepcopy(action)
+    return table
+
 
 def terminal_test(table):  # jugador actual #recibiria tambien el turno no
     # compureba si alguien a ganado , dudas
-    if verify_victory(table):
+    if verificar_victoria(table):
         return True
-    # if verify_victory2(table):
-    #     return True
-    # if verify_victory3(table):
-    #     return True
+    if verificar_victoria2(table):
+        return True
+    if verificar_victoria3(table):
+        return True
     # comprueba si hay empate creo que en este juego no hay empate no termina si no hay ganador
 
     return False
-def utility(table):
-    # ganar en una fila o columna
-    ai_piece = choose_piece()
-    for i in range(4):
-        
-        if all(cell == ai_piece for cell in table[i]):
-            return 1
-        elif all(cell != "-" for cell in table[i]):
-            return -1
-        if all(cell == ai_piece for cell in [table[0][i], table[1][i], table[2][i], table[3][i]]):
-            return 1
-        elif all(cell != "-" for cell in [table[0][i], table[1][i], table[2][i], table[3][i]]):
-            return -1
-    # ganar cuatro esquinas
-    if table[0][0] == ai_piece and table[0][3] == ai_piece and table[3][0] == ai_piece and table[3][3] == ai_piece:
-        return 1
-    # cuadrado pequeño
-    for i in range(3):
-        for j in range(3):
-            if all(cell == ai_piece for cell in [table[i][j], table[i][j+1], table[i+1][j], table[i+1][j+1]]):
-                return 1
-            elif all(cell != "-" for cell in [table[i][j], table[i][j+1], table[i+1][j], table[i+1][j+1]]):
-                return -1
-    # no hay ganador
-    return 0
 
 
-# function for main
+def actions(table, piece):
+  res = []
+  for i in range(len(table)):
+    for j in range(len(table[i])):
+      if table[i][j]==piece:
+        # Mueves
+        f, c = i,j
+        c_table = copy.deepcopy(table)
+        for k in range(8):
+          nf, nc = f + cf[k], c + cc[k]
+          if nf>=0 and nf<4 and nc>=0 and nc<4:
+            if c_table[nf][nc]=='_':
+              c_table[f][c]='_'
+              c_table[nf][nc] = piece
+              res.append(c_table)
+  return res # devuelve una lista de matrices que son las acciones
