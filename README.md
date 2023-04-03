@@ -37,7 +37,9 @@ The heuristic that our code uses is to get the numbers of pieces aligned horizon
 Now, we could return this value as the utility value but we know  that there are states in which I have a higher range of good moves, for this reason in the 'values_list' it was seen to be convenient to count the number of available good moves and the higher the quantity, a number is added to the value returned by the utility function.
 
 
-
+<div align="center">
+    <img src="./img/heuristica.png" alt="Logo" width="80" height="80">
+  </a>
 
 
 
